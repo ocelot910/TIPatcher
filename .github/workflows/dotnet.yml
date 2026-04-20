@@ -24,6 +24,8 @@ jobs:
       run: dotnet restore
     - name: Publish
       run: dotnet publish TIPatcher -c Release -p:PublishProfile=win-x64
+    - name: Zip build output
+      run: powershell Compress-Archive -Path publish\* -DestinationPath app.zip
     - name: Upload app
       run: |
         gh release create ${{ github.ref_name }} app.zip --title "Release ${{ github.ref_name }}"
