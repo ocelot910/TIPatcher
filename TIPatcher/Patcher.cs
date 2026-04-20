@@ -7,6 +7,8 @@ using JavaResolver.Class.TypeSystem;
 using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Text;
 using TIPatcher.Interfaces;
@@ -118,7 +120,43 @@ namespace TIPatcher
             ZipFile.CreateFromDirectory(TempDir, Path.Combine(OutputDir, _jarName));
             logger.Log("TIPatcher: Created patched jar");
 
-            logger.Log($"\nTIPatcher: \n\tPatching completed. \n\tPatched jar is in {Path.Combine(OutputDir,_jarName)}. \n\tCopy it to {_tiPath}, overwriting the existing {_jarName}");
+            logger.Log($"\nTIPatcher: Patching completed. \nTIPatcher: Patched jar is in {Path.Combine(OutputDir, _jarName)}. \nTIPatcher: Copy it to {_tiPath}, overwriting the existing {_jarName}");
+
+            if (Path.Exists(_tiPath))
+            {
+                logger.Log("TIPatcher: Do you want to copy the patched file automatically? This requires administrator privileges (y/n)");
+                string response = logger.Ask();
+
+                if (response.Contains('y'))
+                {
+                    ProcessStartInfo psi = new()
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/c copy /Y \"{Path.Combine(OutputDir, _jarName)}\" \"{_tiPath}\"",
+                        Verb = "runas",
+                        UseShellExecute = true
+                    };
+
+                    try
+                    {
+                        Process? p = Process.Start(psi);
+                        p?.WaitForExit();
+                        if (p?.ExitCode == 0)
+                        {
+                            logger.Log("TIPatcher: Copying successful");
+                        }
+                        else
+                        {
+                            logger.Log($"TIPatcher: Copy failed. Exit code is {p.ExitCode}");
+                        }
+                    }
+                    catch (Win32Exception ex)
+                    {
+                        logger.Log("TIPatcher: UAC is required to copy to the TI directory, as it is write-protected!");
+                    }
+                }
+            }
+            
 
             return true;
         }

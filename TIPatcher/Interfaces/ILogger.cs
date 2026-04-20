@@ -8,5 +8,6 @@ namespace TIPatcher.Interfaces
     {
         void Log(string message);
         void WaitForInput();
+        string Ask();
     }
 }

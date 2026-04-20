@@ -7,6 +7,11 @@ namespace TIPatcher
 {
     public class ConsoleLogger : ILogger
     {
+        public string Ask()
+        {
+            return Console.ReadLine() ?? "";
+        }
+
         public void Log(string message)
         {
             Console.WriteLine(message);
