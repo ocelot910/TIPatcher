@@ -14,6 +14,10 @@ jobs:
   build:           
     runs-on: windows-latest
 
+    env:
+      PUBLISH_DIR: publish
+      ZIP_PATH: patcher.zip
+
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
@@ -23,12 +27,11 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Publish
-      run: dotnet publish TIPatcher -c Release -p:PublishProfile=win-x64
+      run: dotnet publish TIPatcher -c Release -p:PublishProfile=win-x64 -p:DebugType=None -p:DebugSymbols=false -o ${{ env.PUBLISH_DIR }}
     - name: Zip build output
-      run: powershell Compress-Archive -Path publish\* -DestinationPath app.zip
-    - name: Upload app
-      run: |
-        gh release create ${{ github.ref_name }} app.zip --title "Release ${{ github.ref_name }}"
+      run: powershell Compress-Archive -Path ${{ env.PUBLISH_DIR }}\* -DestinationPath ${{ env.ZIP_PATH }}
+    - name: Release
+      run: gh release create main ${{ env.ZIP_PATH }} --title "Release main"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
