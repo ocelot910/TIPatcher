@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="JavaResolver/Source/JavaResolver/JavaResolver.csproj" />
+  <Project Path="TIPatcher/TIPatcher.csproj" />
+</Solution>
