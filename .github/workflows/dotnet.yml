@@ -1,0 +1,39 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+      
+permissions:
+  contents: write
+
+jobs:
+  build:           
+    runs-on: windows-latest
+
+    env:
+      PUBLISH_DIR: publish
+      ZIP_PATH: patcher.zip
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Publish
+      run: dotnet publish TIPatcher -c Release -p:PublishProfile=win-x64 -p:DebugType=None -p:DebugSymbols=false -o ${{ env.PUBLISH_DIR }}
+    - name: Zip build output
+      run: powershell Compress-Archive -Path ${{ env.PUBLISH_DIR }}\* -DestinationPath ${{ env.ZIP_PATH }}
+    - name: Release
+      run: gh release create main ${{ env.ZIP_PATH }} --title "Release main"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      
