@@ -33,7 +33,7 @@ jobs:
     - name: Zip build output
       run: powershell Compress-Archive -Path ${{ env.PUBLISH_DIR }}\* -DestinationPath ${{ env.ZIP_PATH }}
     - name: Release
-      run: gh release create main ${{ env.ZIP_PATH }} --title "Release main"
+      run: gh release create main ${{ env.ZIP_PATH }} --title "${{ github.ref_name }}"
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
