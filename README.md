@@ -3,7 +3,7 @@
 
 ## Prerequisites
 - A computer running Windows
-- TI Nspire CX CAS Student Software installed
+- Administrator rights
 
 ## How to use
 
