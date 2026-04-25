@@ -9,6 +9,7 @@ namespace TIPatcher
     {
         public string Ask()
         {
+            Console.Write("> ");
             return Console.ReadLine() ?? "";
         }
 
