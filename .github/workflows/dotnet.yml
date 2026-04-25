@@ -41,7 +41,7 @@ jobs:
 
     - name: Zip (Windows)
       if: matrix.os == 'windows-latest'
-      run: Compress-Archive -Path $env:PUBLISH_DIR\* -DestinationPath patcher-win.zip
+      run: Compress-Archive -Path $env:PUBLISH_DIR\* -DestinationPath patcher-windows.zip
 
     - name: Zip (Linux)
       if: matrix.os == 'ubuntu-latest'
