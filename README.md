@@ -8,7 +8,7 @@
 ## How to use
 
 1) Download and install the [TI Nspire CX CAS Student Software](https://education.ti.com/en/software/details/en/36BE84F974E940C78502AA47492887AB/ti-nspirecxcas_pc_full)
-2) Download the latest release (patcher.zip) from [Releases](/releases)
+2) Download the latest release (patcher.zip) from [Releases](https://github.com/ocelot910/TIPatcher/releases)
 3) Extract patcher.zip and run TIPatcher.exe. When it asks to copy the patched file, input 'y'
 4) Done! As long as you don't update the TI Nspire CX CAS Student Software, it will remain activated
 
