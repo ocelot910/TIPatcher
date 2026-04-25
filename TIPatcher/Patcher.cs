@@ -18,16 +18,19 @@ namespace TIPatcher
     public class Patcher(ILogger logger)
     {
         // constants
-        private static string _tiPath => """C:\Program Files\TI Education\TI-Nspire CX CAS Student Software\lib\""";
+
+        private static string _tiPath => """C:\Program Files\TI Education\TI-Nspire CX CAS Student Software\""";
+        private static string _libPath => Path.Combine(_tiPath + "lib");
+        private static string _tiExeName => "TI-Nspire CX CAS Student Software.exe";
         private static string _classPath => """com\ti\et\phoenix\jni\ApplWrapper.class""";
         private static string _jarName => "docfw.jar";
         private static string _tempDirname => "Temp";
         private static string[] _fieldsToPatch => ["isLicenseCheckEnabled", "isVerificationEnabled"];
 
-
+        // properties
         public string OutputDir { set; get; } = AppContext.BaseDirectory;
         public string TempDir { set; get; } = "";
-        public string PathToJar { set; get; } = Path.Combine(_tiPath, _jarName);
+        public string PathToJar { set; get; } = Path.Combine(_libPath, _jarName);
 
         public bool Patch()
         {
@@ -120,19 +123,36 @@ namespace TIPatcher
             ZipFile.CreateFromDirectory(TempDir, Path.Combine(OutputDir, _jarName));
             logger.Log("TIPatcher: Created patched jar");
 
-            logger.Log($"\nTIPatcher: Patching completed. \nTIPatcher: Patched jar is in {Path.Combine(OutputDir, _jarName)}. \nTIPatcher: Copy it to {_tiPath}, overwriting the existing {_jarName}");
+            logger.Log($"\nTIPatcher: Patching completed. \nTIPatcher: Patched jar is in {Path.Combine(OutputDir, _jarName)}. \nTIPatcher: Copy it to {_libPath}, overwriting the existing {_jarName}");
 
-            if (Path.Exists(_tiPath))
+            if (Path.Exists(_libPath))
             {
                 logger.Log("TIPatcher: Do you want to copy the patched file automatically? This requires administrator privileges (y/n)");
                 string response = logger.Ask();
 
                 if (response.Contains('y'))
                 {
+                    Process[] processes = Process.GetProcessesByName(_tiExeName.Replace(".exe", ""));
+                    if (processes.Length == 1)
+                    {
+                        logger.Log("TIPatcher: " + _tiExeName + " is running! Stopping " + _tiExeName);
+
+                        try
+                        {
+                            processes[0].Kill();
+                            logger.Log("TIPatcher: Successfully killed " + _tiExeName);
+                        }
+                        catch
+                        {
+                            logger.Log("TIPatcher: Failed to kill " + _tiExeName + "!");
+                        }
+                    }
+
+
                     ProcessStartInfo psi = new()
                     {
                         FileName = "cmd.exe",
-                        Arguments = $"/c copy /Y \"{Path.Combine(OutputDir, _jarName)}\" \"{_tiPath}\"",
+                        Arguments = $"/c copy /Y \"{Path.Combine(OutputDir, _jarName)}\" \"{_libPath}\"",
                         Verb = "runas",
                         UseShellExecute = true
                     };
@@ -143,14 +163,37 @@ namespace TIPatcher
                         p?.WaitForExit();
                         if (p?.ExitCode == 0)
                         {
-                            logger.Log("TIPatcher: Copying successful");
+                            logger.Log("TIPatcher: Copying successful!");
+
+                            logger.Log("TIPatcher: Do you want to launch " + _tiExeName + "? (y/n)");
+
+                            string startTi = logger.Ask();
+
+                            if (startTi.Contains('y'))
+                            {
+                                if (File.Exists(Path.Combine(_tiPath, _tiExeName)))
+                                {
+                                    logger.Log("TIPatcher: Starting " + _tiExeName);
+
+                                    ProcessStartInfo tiPSI = new(Path.Combine(_tiPath, _tiExeName));
+                                    try
+                                    {
+                                        Process? tiProcess = Process.Start(tiPSI);
+                                    }
+                                    catch
+                                    {
+                                        logger.Log("TIPatcher: Failed to start " + _tiExeName + "!");
+
+                                    }
+                                }
+                            }
                         }
                         else
                         {
-                            logger.Log($"TIPatcher: Copy failed. Exit code is {p.ExitCode}");
+                            logger.Log($"TIPatcher: Copy failed. Exit code is {p?.ExitCode}");
                         }
                     }
-                    catch (Win32Exception ex)
+                    catch (Win32Exception)
                     {
                         logger.Log("TIPatcher: UAC is required to copy to the TI directory, as it is write-protected!");
                     }
