@@ -16,10 +16,11 @@
 ### Linux
 *Tested on Ubuntu 24.02 WSL and VM* 
 1) Download and install [Wine](https://www.winehq.org/)
-2) Download the latest release (patcher-linux.zip) from [Releases](https://github.com/ocelot910/TIPatcher/releases)
-3) Extract patcher.zip and open the extracted directory in the Terminal
-4) Run `chmod +x TIPatcher` and then `./TIPatcher`. When it asks to copy the patched file, input 'y'
-5) Done! As long as you don't update the TI Nspire CX CAS Student Software, it will remain activated  
+2) Download and install the [TI Nspire CX CAS Student Software](https://education.ti.com/en/software/details/en/36BE84F974E940C78502AA47492887AB/ti-nspirecxcas_pc_full) for Windows, and install it through Wine
+3) Download the latest release (patcher-linux.zip) from [Releases](https://github.com/ocelot910/TIPatcher/releases)
+4) Extract patcher.zip and open the extracted directory in the Terminal
+5) Run `chmod +x TIPatcher` and then `./TIPatcher`. When it asks to copy the patched file, input 'y'
+6) Done! As long as you don't update the TI Nspire CX CAS Student Software, it will remain activated  
 **Note**: If the font is missing (renders as boxes), then install Microsoft Core Fonts:
 `sudo apt install ttf-mscorefonts-installer`
 
