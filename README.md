@@ -1,5 +1,8 @@
 # TIPatcher
-"Patches" TI Nspire CX CAS Student Software 
+"Patches" TI Nspire CX CAS Student Software permanently
+
+## Don't want to run an executable, or on MacOS?
+Use [TIKeygen](https://ocelot910.github.io/TIKeygen/) to get activated till [2038](https://en.wikipedia.org/wiki/Year_2038_problem)
 
 ## Prerequisites
 - A computer running Windows or Linux
@@ -9,12 +12,12 @@
 
 ### Windows
 1) Download and install the [TI Nspire CX CAS Student Software](https://education.ti.com/en/software/details/en/36BE84F974E940C78502AA47492887AB/ti-nspirecxcas_pc_full) for Windows
-2) Download the latest release (patcher-windows.zip) from [Releases](https://github.com/ocelot910/TIPatcher/releases)
-3) Extract patcher.zip and run TIPatcher.exe. When it asks to copy the patched file, input 'y'
+2) Download the latest release (`patcher-windows.zip`) from [Releases](https://github.com/ocelot910/TIPatcher/releases)
+3) Extract patcher.zip and run `TIPatcher.exe`. When it asks to copy the patched file, input `y` and accept the UAC prompt
 4) Done! As long as you don't update the TI Nspire CX CAS Student Software, it will remain activated
 
 ### Linux
-*Tested on Ubuntu 24.02 WSL and VM* 
+*Tested on Ubuntu 24.02 VM and Fedora WSL* 
 1) Download and install [Wine](https://www.winehq.org/)
 2) Download and install the [TI Nspire CX CAS Student Software](https://education.ti.com/en/software/details/en/36BE84F974E940C78502AA47492887AB/ti-nspirecxcas_pc_full) for Windows, and install it through Wine
 3) Download the latest release (patcher-linux.zip) from [Releases](https://github.com/ocelot910/TIPatcher/releases)
