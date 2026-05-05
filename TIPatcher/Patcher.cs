@@ -54,19 +54,19 @@ namespace TIPatcher
 
         public bool Patch()
         {
-            logger.Log("TIPatcher: Starting patch...");
+            logger.Log("Starting patch...");
 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
-                logger.Log("TIPatcher: TIPatcher doesn't support MacOS! Quitting...");
+                logger.Error("TIPatcher doesn't support MacOS! Quitting...");
                 return false;
             }
 
             if (!File.Exists(PathToJar))
             {
-                logger.Log($"TIPatcher: Can't find docfw jar at {PathToJar}! You need to install " + _tiName);
+                logger.Error($"Can't find docfw jar at {PathToJar}! You need to install " + _tiName);
 
-                logger.Log("TIPatcher: Do you want to open the download page for " + _tiName + "? (y/n)");
+                logger.Log("Do you want to open the download page for " + _tiName + "? (y/n)");
                 string response = logger.Ask();
 
                 if (response.Contains('y'))
@@ -74,11 +74,11 @@ namespace TIPatcher
                     try
                     {
                         Process.Start(new ProcessStartInfo(_tiUrl) { UseShellExecute = true });
-                        logger.Log("TIPatcher: Opened download page. Select the installer for Windows.");
+                        logger.Log("Opened download page.");
                     }
                     catch
                     {
-                        logger.Log("TIPatcher: Failed to launch download page!");
+                        logger.Error("Failed to launch download page!");
                     }
                 }
                 return false;
@@ -86,19 +86,19 @@ namespace TIPatcher
 
             if (!Directory.Exists(OutputDir))
             {
-                logger.Log("TIPatcher: Output directory doesn't exist! Making directory...");
+                logger.Log("Output directory doesn't exist! Making directory...");
                 Directory.CreateDirectory(OutputDir);
             }
 
             TempDir = Path.Combine(OutputDir, _tempDirname);
-            logger.Log($"TIPatcher: Using temporary directory {TempDir}");
+            logger.Log($"Using temporary directory {TempDir}");
 
             if (Directory.Exists(TempDir))
             {
                 Directory.Delete(TempDir, true);
             }
             Directory.CreateDirectory(TempDir);
-            logger.Log($"TIPatcher: Created temporary directory {TempDir}");
+            logger.Log($"Created temporary directory {TempDir}");
 
 
             ZipFile.ExtractToDirectory(PathToJar, TempDir);
@@ -111,7 +111,7 @@ namespace TIPatcher
             {
                 File.Delete(Path.Combine(TempDir, "META-INF", "TI.SF"));
             }
-            logger.Log("TIPatcher: Removed signatures");
+            logger.Log("Removed signatures");
 
             var classFile = JavaClassFile.FromFile(Path.Combine(TempDir, _classPath));
 
@@ -123,7 +123,7 @@ namespace TIPatcher
                 string methodName = classFile.ConstantPool.ResolveString(field.NameIndex);
                 if (_fieldsToPatch.Contains(methodName))
                 {
-                    logger.Log("TIPatcher: Patching " + methodName);
+                    logger.Log("Patching " + methodName);
 
                     var codeAttrib = field.Attributes.First(a => classFile.ConstantPool.ResolveString(a.NameIndex) == CodeAttribute.AttributeName);
 
@@ -166,18 +166,18 @@ namespace TIPatcher
 
             ZipFile.CreateFromDirectory(TempDir, Path.Combine(OutputDir, _jarName));
 
-            logger.Log("TIPatcher: Created patched jar");
-            logger.Log($"TIPatcher: Patching completed.");
+            logger.Log("Created patched jar");
+            logger.Log($"Patching completed.");
             
 
             if (Path.Exists(_libPath))
             {
-                logger.Log($"TIPatcher: Do you want to copy the patched file automatically to {_libPath}?");
+                logger.Log($"Do you want to copy the patched file automatically to {_libPath}?");
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    logger.Log($"TIPatcher: This will require administrator privileges.");
+                    logger.Log($"This will require administrator privileges.");
                 }
-                logger.Log($"TIPatcher: Copy? (y/n)");
+                logger.Log($"Copy? (y/n)");
                 string response = logger.Ask();
 
                 if (response.Contains('y'))
@@ -185,24 +185,24 @@ namespace TIPatcher
                     Process[] processes = Process.GetProcessesByName(_tiName);
                     foreach (Process process in processes)
                     {
-                        logger.Log("TIPatcher: " + _tiName + " is running! Stopping " + _tiExeName);
+                        logger.Log("" + _tiName + " is running! Stopping " + _tiExeName);
 
                         try
                         {
                             process.Kill();
                             process.WaitForExit();
-                            logger.Log("TIPatcher: Successfully killed " + _tiExeName);
+                            logger.Log("Successfully killed " + _tiExeName);
                         }
                         catch
                         {
-                            logger.Log("TIPatcher: Failed to kill " + _tiExeName + "!");
+                            logger.Error("Failed to kill " + _tiExeName + "!");
                         }
                     }
 
 
                     if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
                     {
-                        logger.Log("TIPatcher: Linux detected!");
+                        logger.Log("Linux detected!");
 
                         try
                         {
@@ -212,9 +212,9 @@ namespace TIPatcher
                                 overwrite: true
                             );
 
-                            logger.Log("TIPatcher: Patched successfully!");
+                            logger.Log("Patched successfully!");
 
-                            logger.Log("TIPatcher: Do you want to launch " + _tiName + "? (y/n)");
+                            logger.Log("Do you want to launch " + _tiName + "? (y/n)");
 
                             string startTi = logger.Ask();
 
@@ -222,7 +222,7 @@ namespace TIPatcher
                             {
                                 if (File.Exists(Path.Combine(_tiPath, _tiExeName)))
                                 {
-                                    logger.Log("TIPatcher: Starting " + _tiExeName);
+                                    logger.Log("Starting " + _tiExeName);
 
                                     ProcessStartInfo tiPSI = new("wine")
                                     {
@@ -235,8 +235,8 @@ namespace TIPatcher
                                     }
                                     catch
                                     {
-                                        logger.Log("TIPatcher: Failed to start " + _tiExeName + "!");
-                                        logger.Log("TIPatcher: This may be due to your Wine configuration");
+                                        logger.Error("Failed to start " + _tiExeName + "!");
+                                        logger.Error("This may be due to your Wine configuration");
                                         return false;
                                     }
                                 }
@@ -244,12 +244,12 @@ namespace TIPatcher
                         }
                         catch (DirectoryNotFoundException)
                         {
-                            logger.Log("TIPatcher: Directory not found (Wine)");
+                            logger.Error("Directory not found (Wine)");
                             return false;
                         }
                         catch
                         {
-                            logger.Log("TIPatcher: An error occurred while copying the file.");
+                            logger.Error("An error occurred while copying the file.");
                             return false;
                         }
                     }
@@ -269,9 +269,12 @@ namespace TIPatcher
                             p?.WaitForExit();
                             if (p?.ExitCode == 0)
                             {
-                                logger.Log("TIPatcher: Copying successful!");
+                                logger.Log("Copying successful!");
+                                logger.Warning($"Do NOT update {_tiName} without firstly deleting \"{PathToJar}\"!");
+                                logger.Info($"You may see ! symbols in the ribbon or other locations. This does not affect the program at all.");
 
-                                logger.Log("TIPatcher: Do you want to launch " + _tiName + "? (y/n)");
+
+                                logger.Log("Do you want to launch " + _tiName + "? (y/n)");
 
                                 string startTi = logger.Ask();
 
@@ -279,7 +282,7 @@ namespace TIPatcher
                                 {
                                     if (File.Exists(Path.Combine(_tiPath, _tiExeName)))
                                     {
-                                        logger.Log("TIPatcher: Starting " + _tiExeName);
+                                        logger.Log("Starting " + _tiExeName);
 
                                         ProcessStartInfo tiPSI = new(Path.Combine(_tiPath, _tiExeName));
                                         try
@@ -288,7 +291,7 @@ namespace TIPatcher
                                         }
                                         catch
                                         {
-                                            logger.Log("TIPatcher: Failed to start " + _tiExeName + "!");
+                                            logger.Error("Failed to start " + _tiExeName + "!");
                                             return false;
                                         }
                                     }
@@ -296,21 +299,21 @@ namespace TIPatcher
                             }
                             else
                             {
-                                logger.Log($"TIPatcher: Copy failed. Exit code is {p?.ExitCode}");
+                                logger.Error($"Copy failed. Exit code is {p?.ExitCode}");
                                 return false;
                             }
                         }
                         catch (Win32Exception)
                         {
-                            logger.Log("TIPatcher: UAC is required to copy to the TI directory, as it is write-protected!");
+                            logger.Error("UAC is required to copy to the TI directory, as it is write-protected!");
                             return false;
                         }
                     }
                 }
                 else
                 {
-                    logger.Log($"TIPatcher: Patched jar is in {Path.Combine(OutputDir, _jarName)}.");
-                    logger.Log($"TIPatcher: Copy it to {_libPath}, overwriting the existing {_jarName}");
+                    logger.Log($"Patched jar is in {Path.Combine(OutputDir, _jarName)}.");
+                    logger.Log($"Copy it to {_libPath}, overwriting the existing {_jarName}");
                 }
             }
 

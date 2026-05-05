@@ -5,7 +5,7 @@ public class Program
 {
     public static int Main(string[] args)
     {
-        ConsoleLogger logger = new();
+        ConsoleLogger logger = new("[TIPatcher]", ConsoleColor.Cyan);
         Patcher patcher = new(logger);
 
         for (int i = 0; i < args.Length; i++)
